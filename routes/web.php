@@ -32,8 +32,12 @@ $router->get('/stuffs/trash/restore/{id}', 'StuffController@restore');
 $router->get('/stuffs/trash/permanent-delete/{id}', 'StuffController@permanenDelete');
 
 //inbound
+$router->get('/inbound-stuffs/data', 'InboundStuffController@index');
 $router->post('/inbound-stuffs/store','InboundStuffController@store');
 $router->post('/inbound-stuffs/delete/{id}','InboundStuffController@destroy');
+$router->get('/inbound-stuffs/trash', 'InboundStuffController@trash');
+$router->get('/restore/{id}', 'InboundStuffController@restore');
+$router->delete('/inbound-stuffs/permanent-delete/{id}', 'InboundStuffController@permanentDelete');
 
 
 //user
