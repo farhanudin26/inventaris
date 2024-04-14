@@ -1,0 +1,6 @@
+Tugas!
+
+Buat CRUD+trash, restore, permanen delete untuk table users validasi :
+email : unique
+username : min 4, unique
+password : hash/bcrypt
