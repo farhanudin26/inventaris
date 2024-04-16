@@ -33,8 +33,8 @@ class InboundStuffController extends Controller
                 'total' => 'required',
                 'date' => 'required',
                 // 'proof': type file image
-                'proof_file' => 'required|image'
-            ]);
+                'proof_file' => 'required|mimes:jpeg,png,jpg,pdf|max:2048',
+             ]);
 
             // $request->file(): ambil data yg tipe nya file
             // getClientOriginalName(): ambil nama asli dari file yg diupload
@@ -90,7 +90,7 @@ class InboundStuffController extends Controller
             $minusTotalStock = $dataStock->update(['total_available'=> $total_available]);
 
             if ($minusTotalStock) {
-                $updatedStuffWithInboundAndStock = Stuff::where('id',$stuffId)->with('inbounfStuffs','stuffStock')
+                $updatedStuffWithInboundAndStock = Stuff::where('id',$stuffId)->with('inboundStuffs','stuffStock')
                 ->first();
                 //delete inbound
                 // $inboundData->delete();
@@ -148,37 +148,22 @@ class InboundStuffController extends Controller
         }
     }
 
-    public function deletePermanent(Inbounstuff $inboundStuff, Request $request, $id)
-    {
-        try {
-            $getInbound = Inbounstuff::onlyTrashed()->where('id',$id)->first();
+   public function permanentDelete(Inbounstuff $inboundStuff, Request $request, $id)
+{
+    try {
+        $inboundData = Inbounstuff::onlyTrashed()->findOrFail($id);
+        $proofFilePath = base_path('public/proof/' . $inboundData->proof_file);
 
-            unlink(base_path('public/proof/'.$getInbound->proof_file));
-            // Menghapus data dari database
-            $checkProses = Inbounstuff::where('id', $id)->forceDelete();
-
-            // Memberikan respons sukses
-            return ApiFormatter::sendResponse(200, 'success', 'Data inbound-stuff berhasil dihapus permanen');
-        } catch(\Exception $err) {
-            // Memberikan respons error jika terjadi kesalahan
-            return ApiFormatter::sendResponse(400, 'bad request', $err->getMessage());
+        if (file_exists($proofFilePath)) {
+            unlink($proofFilePath); // Hapus file dari storage
         }
+
+        $inboundData->forceDelete(); // Hapus data dari database secara permanen
+
+        return ApiFormatter::sendResponse(200, 'success', 'Data inbound-stuff berhasil dihapus permanen');
+    } catch (\Exception $err) {
+        return ApiFormatter::sendResponse(400, 'bad request', $err->getMessage());
     }
-
-    private function deleteAssociatedFile(Inbounstuff $inboundStuff)
-    {
-        // Mendapatkan jalur lengkap ke direktori public
-        $publicPath = $_SERVER['DOCUMENT_ROOT'] . '/public/proof';
-
-
-        // Menggabungkan jalur file dengan jalur direktori public
-         $filePath = public_path('proof/'.$inboundStuff->proof_file);
-
-        // Periksa apakah file ada
-        if (file_exists($filePath)) {
-            // Hapus file jika ada
-            unlink(base_path($filePath));
-        }
-    }
+}
 
 }

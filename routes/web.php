@@ -17,39 +17,46 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-//stuff
+
+//static
 //struktur : $router->method('/path', 'NamaController@namaFunction');
-//statis
+
+//index
 $router->get('stuffs', 'StuffController@index');
-$router->post('/stuffs/store', 'StuffController@store');
-$router->get('/stuffs/trash', 'StuffController@trash');
-//dinamin
-$router->get('/stuffs/{id}', 'StuffController@show');
-$router->patch('/stuffs/update/{id}', 'StuffController@update');
-$router->delete('/stuffs/delete/{id}', 'StuffController@destroy');
-//softdeletes : trash, restore, undo
-$router->get('/stuffs/trash/restore/{id}', 'StuffController@restore');
-$router->get('/stuffs/trash/permanent-delete/{id}', 'StuffController@permanenDelete');
-
-//inbound
-$router->get('/inbound-stuffs/data', 'InboundStuffController@index');
-$router->post('/inbound-stuffs/store','InboundStuffController@store');
-$router->post('/inbound-stuffs/delete/{id}','InboundStuffController@destroy');
-$router->get('/inbound-stuffs/trash', 'InboundStuffController@trash');
-$router->get('/restore/{id}', 'InboundStuffController@restore');
-$router->delete('/inbound-stuffs/permanent-delete/{id}', 'InboundStuffController@permanentDelete');
-
-
-//user
-//statis
 $router->get('users', 'UserController@index');
+$router->get('/inbound-stuffs/data', 'InboundStuffController@index');
+
+//store
+$router->post('/stuffs/store', 'StuffController@store');
 $router->post('/users/store', 'UserController@store');
+$router->post('/inbound-stuffs/store', 'InboundStuffController@store');
+
+//trash
+$router->get('/stuffs/trash', 'StuffController@trash');
 $router->get('/users/trash', 'UserController@trash');
+$router->get('/inbound-stuffs/trash', 'InboundStuffController@trash');
+
 //dinamis
+
+//show
+$router->get('/stuffs/{id}', 'StuffController@show');
 $router->get('/users/{id}', 'UserController@show');
+
+//update
 $router->patch('/users/update/{id}', 'UserController@update');
+$router->patch('/stuffs/update/{id}', 'StuffController@update');
+
+//destroy
+$router->delete('/stuffs/delete/{id}', 'StuffController@destroy');
 $router->delete('/users/delete/{id}', 'UserController@destroy');
+$router->delete('/inbound-stuffs/delete/{id}', 'InboundStuffController@destroy');
+
+//restore
+$router->get('/stuffs/trash/restore/{id}', 'StuffController@restore');
 $router->get('/users/trash/restore/{id}', 'UserController@restore');
-$router->get('/users/trash/permanent-delete/{id}', ' UserController@permanenDelete');
+$router->get('/restore/{id}', 'InboundStuffController@restore');
 
-
+//permanent-delete
+$router->get('/stuffs/trash/permanent-delete/{id}', 'StuffController@permanentDelete');
+$router->get('/users/trash/permanent-delete/{id}', ' UserController@permanentDelete');
+$router->delete('/inbound-stuffs/permanent-delete/{id}', 'InboundStuffController@permanentDelete');
