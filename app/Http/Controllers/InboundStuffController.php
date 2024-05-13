@@ -11,6 +11,12 @@ use Illuminate\Support\Str;
 
 class InboundStuffController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
+
     public function index (Request $request)
     {
         try {
@@ -78,28 +84,35 @@ class InboundStuffController extends Controller
     {
         try {
             $inboundData = Inbounstuff::where('id', $id)->first();
-            //simpan data dari inbound yang diperlukan /akan digunakan nanti setelah delete
+            //simpan data dari inbound yang diperlukan / akan digunakan nanti setelah delete
             $stuffId = $inboundData['stuff_id'];
             $totalInbound = $inboundData['total'];
+
+            //kurangi total_available sebelumnya dengan total dari inbound yang akan dihapus
+            $dataStock = StuffStock::where('stuff_id', $inboundData['stuff_id'])->first();
+
+            if ($dataStock['total_available'] < $totalInbound) {
+                return ApiFormatter::sendResponse(400,'bad request','Jumlah total inbound yang akan dihapus lebih besar dari total available stuff saat ini!');
+            }
+            $total_available = (int)$dataStock['total_available'] - (int) $totalInbound;
+
+
+            // hapus data inbound
             $inboundData->delete();
 
-            //kurangin total_avalable sebelumnya dengan total dari inbound yang akan dihapus
-            $dataStock = StuffStock::where('stuff_id', $inboundData['stuff_id'])->first();
-            $total_available = (int)$inboundData['total_available'] - (int) $totalInbound;
-
-            $minusTotalStock = $dataStock->update(['total_available'=> $total_available]);
+            // update total_available di StuffStock
+            $minusTotalStock = StuffStock::where('stuff_id', $inboundData['stuff_id'])->update(['total_available' => $total_available]);
 
             if ($minusTotalStock) {
-                $updatedStuffWithInboundAndStock = Stuff::where('id',$stuffId)->with('inboundStuffs','stuffStock')
-                ->first();
-                //delete inbound
-                // $inboundData->delete();
-                return ApiFormatter::sendResponse(200,'success',$updatedStuffWithInboundAndStock);
+                // ambil data Stuff setelah perubahan
+                $updatedStuffWithInboundAndStock = Stuff::where('id', $stuffId)->with('inboundStuffs', 'stuffStock')->first();
+                return ApiFormatter::sendResponse(200, 'success', $updatedStuffWithInboundAndStock);
             }
-        }catch (\Exception $err) {
+        } catch (\Exception $err) {
             return ApiFormatter::sendResponse(400, 'bad request', $err->getMessage());
         }
     }
+
 
     public function trash()
     {
@@ -165,5 +178,6 @@ class InboundStuffController extends Controller
         return ApiFormatter::sendResponse(400, 'bad request', $err->getMessage());
     }
 }
+
 
 }

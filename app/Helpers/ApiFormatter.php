@@ -22,8 +22,6 @@
             //message : desc http status code ('succes', 'bad request', 'server error')
             //data : hasil yang diambil dari db
 
-
-
         }
 
     }

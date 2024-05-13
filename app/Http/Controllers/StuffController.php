@@ -10,6 +10,12 @@ use PhpParser\Node\Stmt\Catch_;
 
 class StuffController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function index()
         {
             try {
@@ -90,16 +96,23 @@ class StuffController extends Controller
     }
 
     public function destroy($id)
-    {
-        try {
-            $checkProsess = Stuff::where('id',$id)->delete();
-            if ($checkProsess) {
-                return ApiFormatter::sendResponse(200, 'succes', 'Berhasil hapus data stuff!');
-            }
-        }catch(\Exception $err) {
-            return ApiFormatter::sendResponse(400, 'bad request', $err->getMessage());
+{
+    try {
+        $stuff = Stuff::where('id', $id)->first();
+
+        if ($stuff->inboundStuffs()->exists() || $stuff->stuffStock()->exists() || $stuff->lendings()->exists()) {
+            return ApiFormatter::sendResponse(400, 'bad request','Tidak dapat menghapus data stuff karena sudah terdapat data inbound!');
         }
+
+        $checkProcess = $stuff->delete();
+        if ($checkProcess) {
+            return ApiFormatter::sendResponse(200, 'success', 'Berhasil hapus data stuff');
+        }
+    } catch (\Exception $err) {
+        return ApiFormatter::sendResponse(400, 'bad request', $err->getMessage());
     }
+}
+
 
     public function trash()
     {

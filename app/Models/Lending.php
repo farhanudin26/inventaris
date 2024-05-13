@@ -24,7 +24,7 @@ class Lending extends Model
 
     public function restoration()
     {
-        return $this->hanOne(Restoration::class);
+        return $this->hasOne(Restoration::class);
     }
 
 
