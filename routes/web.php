@@ -17,6 +17,8 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+//cors
+$router->group(['middleware' => 'cors'], function ($router) {
 
 //static
 //struktur : $router->method('/path', 'NamaController@namaFunction');
@@ -25,7 +27,7 @@ $router->get('/', function () use ($router) {
 $router->get('stuffs', 'StuffController@index');
 $router->get('users', 'UserController@index');
 $router->get('lendings', 'LendingController@index');
-$router->get('/inbound-stuffs/data', 'InboundStuffController@index');
+$router->get('/inbound-stuffs', 'InboundStuffController@index');
 
 
 //store
@@ -47,6 +49,7 @@ $router->get('/inbound-stuffs/trash', 'InboundStuffController@trash');
 //show
 $router->get('/stuffs/{id}', 'StuffController@show');
 $router->get('/users/{id}', 'UserController@show');
+$router->get('/inbound-stuffs/{id}', 'InboundStuffController@show');
 
 //update
 $router->patch('/users/update/{id}', 'UserController@update');
@@ -72,3 +75,6 @@ $router->delete('/inbound-stuffs/permanent-delete/{id}', 'InboundStuffController
 $router->post('login', 'AuthController@login');
 $router->get('logout', 'AuthController@logout');
 $router->get('profile', 'AuthController@me');
+
+
+});

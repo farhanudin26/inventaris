@@ -20,7 +20,7 @@ class StuffController extends Controller
         {
             try {
                 //ambil data yg mau ditampilkan
-                $data = Stuff::all()->toArray();
+                $data = Stuff::with('stuffStock')->get();
 
                 return ApiFormatter::sendResponse(200, 'success', $data);
             }catch (\Exception $err){
@@ -98,13 +98,13 @@ class StuffController extends Controller
     public function destroy($id)
 {
     try {
-        $stuff = Stuff::where('id', $id)->first();
+        $stuff = Stuff::where('id', $id)->with('inboundStuffs')->first();
 
-        if ($stuff->inboundStuffs()->exists() || $stuff->stuffStock()->exists() || $stuff->lendings()->exists()) {
-            return ApiFormatter::sendResponse(400, 'bad request','Tidak dapat menghapus data stuff karena sudah terdapat data inbound!');
+        if (count($stuff['inboundStuffs']) > 0 ) {
+            return ApiFormatter::sendResponse(400, 'bad request','Tidak bisa menghapus! sudah terdapat inbound');
         }
-
         $checkProcess = $stuff->delete();
+
         if ($checkProcess) {
             return ApiFormatter::sendResponse(200, 'success', 'Berhasil hapus data stuff');
         }
@@ -140,7 +140,7 @@ class StuffController extends Controller
     }
   }
 
-  public function permanenDelete($id)
+  public function permanentDelete($id)
   {
     try {
         // forceDelete() : menghapus permanent (hilang juga data di db nya)

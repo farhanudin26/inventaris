@@ -36,7 +36,7 @@ class UserController extends Controller
             $this->validate($request, [
                 'username' => 'required|min:4|unique:users,username',
                 'email' => 'required|unique:users,email',
-                'password' => 'required|min:6',
+                'password' => 'required',
                 'role' => 'required'
             ]);
 
@@ -78,7 +78,7 @@ class UserController extends Controller
           $this->validate($Request, [
               'username' => 'required|min:4|unique:users,username,' . $id,
               'email' => 'required|unique:users,email,' . $id,
-              'password' => 'required|min:6',
+              'password' => 'required|min:3',
               'role' => 'required'
           ]);
 
@@ -137,7 +137,7 @@ class UserController extends Controller
     }
   }
 
-  public function permanenDelete($id)
+  public function permanentDelete($id)
   {
       try{
           $cekPermanentDelete = User::onlyTrashed()->where('id', $id)->forceDelete();
